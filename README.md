@@ -33,4 +33,8 @@ git add .
 git commit -m "ign"
 git push -u origin main
 
+git remote add github https://github.com/andregraunt/pystreamlit
+
+git push github master
+
             
