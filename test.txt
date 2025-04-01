@@ -1,0 +1,51 @@
+def write_stream(stream: ((...) -> Any) | Generator[Any, Any, Any] | Iterable[Any] | AsyncGenerator[Any, Any]) -> (list[Any] | str)
+Stream a generator, iterable, or stream-like sequence to the app.
+
+st.write_stream iterates through the given sequences and writes all chunks to the app. String chunks will be written using a typewriter effect. Other data types will be written using st.write.
+
+Parameters
+stream : Callable, Generator, Iterable, OpenAI Stream, or LangChain Stream
+The generator or iterable to stream.
+
+If you pass an async generator, Streamlit will internally convert it to a sync generator.
+
+note
+
+To use additional LLM libraries, you can create a wrapper to manually define a generator function and include custom output parsing.
+
+Returns
+str or list
+The full response. If the streamed output only contains text, this is a string. Otherwise, this is a list of all the streamed objects. The return value is fully compatible as input for st.write.
+
+Example
+You can pass an OpenAI stream as shown in our tutorial, [Build a basic LLM chat app ](https://docs.streamlit.io/develop/tutorials/llms /build-conversational-apps#build-a-chatgpt-like-app). Alternatively, you can pass a generic generator function as input:
+
+ import time
+ import numpy as np
+ import pandas as pd
+ import streamlit as st
+
+ _LOREM_IPSUM = """
+ Lorem ipsum dolor sit amet, **consectetur adipiscing** elit, sed do eiusmod tempor
+ incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis
+ nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.
+ """
+
+
+ def stream_data():
+     for word in _LOREM_IPSUM.split(" "):
+         yield word + " "
+         time.sleep(0.02)
+
+     yield pd.DataFrame(
+         np.random.randn(5, 10),
+         columns=["a", "b", "c", "d", "e", "f", "g", "h", "i", "j"],
+     )
+
+     for word in _LOREM_IPSUM.split(" "):
+         yield word + " "
+         time.sleep(0.02)
+
+
+ if st.button("Stream data"):
+     st.write_stream(stream_data)
